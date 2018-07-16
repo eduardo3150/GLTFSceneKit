@@ -1249,6 +1249,7 @@ public class GLTFUnarchiver {
     }
     
     private func loadWeightAnimationsSampler(index: Int, sampler: Int, paths: [String]) throws -> CAAnimationGroup {
+        print("loadWeightAnimationsSampler: index \(index)")
         guard index < self.animationSamplers.count else {
             throw GLTFUnarchiveError.DataInconsistent("loadWeightAnimationsSampler: out of index: \(index) < \(self.animationSamplers.count)")
         }
@@ -1296,9 +1297,15 @@ public class GLTFUnarchiver {
         let step = animations.count
         let dataLength = values.count / step
         // Comment out to fix animations
-//        guard dataLength == keyTimes.count else {
-//            throw GLTFUnarchiveError.DataInconsistent("loadWeightAnimationsSampler: data count mismatch: \(dataLength) != \(keyTimes.count)")
-//        }
+        
+        print("loadWeightAnimationsSampler :: dataLength: \(dataLength) .. keyTimes.count: \(keyTimes.count)")
+        
+        
+        guard dataLength == keyTimes.count else {
+            print("loadWeightAnimationsSampler: data count mismatch: \(dataLength) != \(keyTimes.count)")
+            return CAAnimationGroup()
+            //throw GLTFUnarchiveError.DataInconsistent("loadWeightAnimationsSampler: data count mismatch: \(dataLength) != \(keyTimes.count)")
+        }
         for i in 0..<animations.count {
             var valueIndex = i
             var v = [NSNumber]()
@@ -1388,11 +1395,14 @@ public class GLTFUnarchiver {
         let weightPaths = node.value(forUndefinedKey: "weightPaths") as? [String]
         for i in 0..<animations.count {
             let animation = animations[i]
+            if (animations[i].name?.contains("Take") == false) {
+                continue
+            }
             for j in 0..<animation.channels.count {
                 let channel = animation.channels[j]
                 if channel.target.node == index {
                     let animation = try self.loadAnimation(index: i, channel: j, weightPaths: weightPaths)
-                    node.addAnimation(animation, forKey: nil)
+                    node.addAnimation(animation, forKey: animations[i].name)
                 }
             }
         }

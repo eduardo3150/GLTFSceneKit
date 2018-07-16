@@ -131,8 +131,10 @@ func createKeyTimeArray(from data: Data, offset: Int, stride: Int, count: Int) -
     }
     let duration = Float(floatArray.last!)
     print("duration: \(duration)")
+    var index = 0
     for val in floatArray {
-        print("dur val: \(val)")
+        print("dur val: \(val) index: \(index)")
+        index += 1
     }
     
     let numberArray: [NSNumber] = floatArray.map { NSNumber(value: $0 / duration) }
